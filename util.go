@@ -1,5 +1,7 @@
 package main
 
+import "strconv"
+
 //EPSILON is equivalence tolerance for float value comparison
 const EPSILON = 0.00001
 
@@ -25,4 +27,10 @@ func Sum(nums ...float64) float64 {
 		result += v
 	}
 	return result
+}
+
+//FloatToString converts a float to a String
+func FloatToString(n float64) string {
+	// to convert a float number to a string
+	return strconv.FormatFloat(n, 'f', 6, 64)[:3]
 }

@@ -50,3 +50,8 @@ func (c *Color) MulScalar(scalar float64) *Color {
 		c.b*scalar,
 	)
 }
+
+//String formats a color as a string
+func (c *Color) String() string {
+	return "c(" + FloatToString(c.r) + "," + FloatToString(c.g) + "," + FloatToString(c.b) + ")"
+}

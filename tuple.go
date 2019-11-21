@@ -117,6 +117,13 @@ func (t *Tuple) Cross(o *Tuple) *Tuple {
 	)
 }
 
-func init() {
-
+//String converts a tuple to a string
+func (t *Tuple) String() string {
+	start := "("
+	if t.IsPoint() {
+		start = "p" + start
+	} else {
+		start = "v" + start
+	}
+	return start + FloatToString(t.x) + "," + FloatToString(t.y) + "," + FloatToString(t.z) + ")"
 }
