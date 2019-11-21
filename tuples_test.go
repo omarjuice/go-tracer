@@ -6,14 +6,14 @@ import (
 )
 
 func TestTupleEqual(t *testing.T) {
-	a := Tuple{1.000001, 2.000002, 3.000000, 0.0}
-	b := Tuple{1.000000, 2.000001, 2.999999, 0.0}
+	a := &Tuple{1.000001, 2.000002, 3.000000, 0.0}
+	b := &Tuple{1.000000, 2.000001, 2.999999, 0.0}
 
 	pass := a.Equals(b)
 	if !pass {
 		t.Errorf("TupleEqual: %v should equal %v", a, b)
 	}
-	a[3] = 1.0
+	a.w = 1.0
 
 	pass = !a.Equals(b)
 	if !pass {
@@ -81,9 +81,9 @@ func TestSubTuple(t *testing.T) {
 }
 
 func TestNegateTuple(t *testing.T) {
-	vector := Tuple{1, -2, 3, 4}
+	vector := &Tuple{1, -2, 3, 4}
 	result := vector.Negate()
-	expected := Tuple{-1, 2, -3, -4}
+	expected := &Tuple{-1, 2, -3, -4}
 
 	pass := result.Equals(expected)
 	if !pass {
@@ -94,7 +94,7 @@ func TestNegateTuple(t *testing.T) {
 func TestMulTuple(t *testing.T) {
 	a := Tuple{1, -2, 3, -4}
 	result := a.Mul(3.5)
-	expected := Tuple{3.5, -7, 10.5, -14}
+	expected := &Tuple{3.5, -7, 10.5, -14}
 
 	pass := result.Equals(expected)
 	if !pass {
@@ -102,7 +102,7 @@ func TestMulTuple(t *testing.T) {
 	}
 
 	result = a.Mul(0.5)
-	expected = Tuple{0.5, -1, 1.5, -2}
+	expected = &Tuple{0.5, -1, 1.5, -2}
 
 	pass = result.Equals(expected)
 	if !pass {
@@ -113,7 +113,7 @@ func TestMulTuple(t *testing.T) {
 func TestDivTuple(t *testing.T) {
 	a := Tuple{1, -2, 3, -4}
 	result := a.Div(2)
-	expected := Tuple{0.5, -1, 1.5, -2}
+	expected := &Tuple{0.5, -1, 1.5, -2}
 
 	pass := result.Equals(expected)
 	if !pass {
