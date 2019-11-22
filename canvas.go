@@ -1,16 +1,22 @@
 package main
 
-import "strings"
+import (
+	"fmt"
+	"io"
+	"os"
+	"strconv"
+	"strings"
+)
 
 //Canvas is a canvas on which pixels are drawn
 type Canvas struct {
-	height, width int
+	width, height int
 	pixels        [][]*Color
 }
 
 //NewCanvas creates a new canvas
-func NewCanvas(height int, width int) *Canvas {
-	canvas := &Canvas{height, width, make([][]*Color, height, height)}
+func NewCanvas(width int, height int) *Canvas {
+	canvas := &Canvas{width, height, make([][]*Color, height, height)}
 	for y := 0; y < height; y++ {
 		canvas.pixels[y] = make([]*Color, width, width)
 		for x := 0; x < width; x++ {
@@ -20,14 +26,74 @@ func NewCanvas(height int, width int) *Canvas {
 	return canvas
 }
 
+func (canvas *Canvas) checkBounds(x, y int) bool {
+	r := true
+	if y < 0 || y >= canvas.height {
+		r = false
+	}
+	if x < 0 || x >= canvas.width {
+		r = false
+	}
+	if !r {
+		fmt.Println(x, y)
+	}
+	return r
+}
+
 //PixelAt returns the pixel at x and y
 func (canvas *Canvas) PixelAt(x, y int) *Color {
+	if !canvas.checkBounds(x, y) {
+		return nil
+	}
 	return canvas.pixels[y][x]
 }
 
 //WritePixel writes a new pixel to the pixel
 func (canvas *Canvas) WritePixel(x, y int, c *Color) {
+	if !canvas.checkBounds(x, y) {
+		return
+	}
 	canvas.pixels[y][x] = NewColor(c.r, c.g, c.b)
+}
+
+//ToPPM writes the canvas to a PPM file
+func (canvas *Canvas) ToPPM(filename string) {
+
+	lines := [][]rune{[]rune{}}
+
+	for y := 0; y < canvas.height; y++ {
+		for x := 0; x < canvas.width; x++ {
+			color := canvas.pixels[y][x].Format()
+
+			if len(color) > 69-len(lines[len(lines)-1]) {
+				lines = append(lines, []rune{})
+			}
+			for _, ch := range color {
+				lines[len(lines)-1] = append(lines[len(lines)-1], ch)
+			}
+		}
+	}
+
+	ppm := []string{"P3", strconv.Itoa(canvas.width) + " " + strconv.Itoa(canvas.height), "255"}
+
+	for _, line := range lines {
+		ppm = append(ppm, string(line))
+	}
+	ppm = append(ppm, "\n")
+
+	filename += ".ppm"
+
+	file, err := os.Open("/" + filename)
+
+	if err != nil {
+		file, _ = os.Create(filename)
+	}
+	defer file.Close()
+
+	_, err = io.WriteString(file, strings.Join(ppm, "\n"))
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 //String converts a canvas to a string

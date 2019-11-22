@@ -30,7 +30,7 @@ func (t *Tuple) IsVector() bool {
 //Equals returns whether a t is equal to ano
 func (t *Tuple) Equals(o *Tuple) bool {
 
-	return FloatEqual(t.x, o.x) && FloatEqual(t.y, o.y) && FloatEqual(t.z, o.z) && FloatEqual(t.w, o.w)
+	return floatEqual(t.x, o.x) && floatEqual(t.y, o.y) && floatEqual(t.z, o.z) && floatEqual(t.w, o.w)
 }
 
 //Add adds two ts together
@@ -125,5 +125,5 @@ func (t *Tuple) String() string {
 	} else {
 		start = "v" + start
 	}
-	return start + FloatToString(t.x) + "," + FloatToString(t.y) + "," + FloatToString(t.z) + ")"
+	return start + floatToString(t.x) + "," + floatToString(t.y) + "," + floatToString(t.z) + ")"
 }

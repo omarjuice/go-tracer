@@ -126,21 +126,21 @@ func TestMagnitude(t *testing.T) {
 	vector := Vector(0, 1, 0)
 	result := vector.Magnitude()
 	expected := 1.0
-	pass := FloatEqual(result, expected)
+	pass := floatEqual(result, expected)
 	if !pass {
 		t.Errorf("Magnitude: result %f should equal %f", result, expected)
 	}
 
 	vector = Vector(1, 0, 0)
 	result = vector.Magnitude()
-	pass = FloatEqual(result, expected)
+	pass = floatEqual(result, expected)
 	if !pass {
 		t.Errorf("Magnitude: result %f should equal %f", result, expected)
 	}
 
 	vector = Vector(0, 0, 1)
 	result = vector.Magnitude()
-	pass = FloatEqual(result, expected)
+	pass = floatEqual(result, expected)
 	if !pass {
 		t.Errorf("Magnitude: result %f should equal %f", result, expected)
 	}
@@ -148,7 +148,7 @@ func TestMagnitude(t *testing.T) {
 	vector = Vector(-1, -2, -3)
 	result = vector.Magnitude()
 	expected = math.Sqrt(14.0)
-	pass = FloatEqual(result, expected)
+	pass = floatEqual(result, expected)
 	if !pass {
 		t.Errorf("Magnitude: result %f should equal %f", result, expected)
 	}
@@ -177,7 +177,7 @@ func TestNormalize(t *testing.T) {
 	result = vector.Normalize()
 	mag := result.Magnitude()
 
-	pass = FloatEqual(mag, 1.0)
+	pass = floatEqual(mag, 1.0)
 	if !pass {
 		t.Errorf("Magnitude: result %f should equal %f", mag, 1.0)
 	}
@@ -189,7 +189,7 @@ func TestDot(t *testing.T) {
 	result := a.Dot(b)
 	expected := 20.0
 
-	pass := FloatEqual(result, expected)
+	pass := floatEqual(result, expected)
 	if !pass {
 		t.Errorf("Magnitude: result %f should equal %f", result, expected)
 	}

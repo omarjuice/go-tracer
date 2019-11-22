@@ -12,7 +12,7 @@ func NewColor(r, g, b float64) *Color {
 
 //Equals checks if a color is equal to another
 func (c *Color) Equals(o *Color) bool {
-	return FloatEqual(c.r, o.r) && FloatEqual(c.g, o.g) && FloatEqual(c.b, o.b)
+	return floatEqual(c.r, o.r) && floatEqual(c.g, o.g) && floatEqual(c.b, o.b)
 }
 
 //Add adds a color with another
@@ -51,7 +51,12 @@ func (c *Color) MulScalar(scalar float64) *Color {
 	)
 }
 
+//Format turns the color into a string "red green blue" e.g. "255 128 16"
+func (c *Color) Format() string {
+	return floatToUint8String(c.r) + " " + floatToUint8String(c.g) + " " + floatToUint8String(c.b) + " "
+}
+
 //String formats a color as a string
 func (c *Color) String() string {
-	return "c(" + FloatToString(c.r) + "," + FloatToString(c.g) + "," + FloatToString(c.b) + ")"
+	return "c(" + floatToString(c.r) + "," + floatToString(c.g) + "," + floatToString(c.b) + ")"
 }

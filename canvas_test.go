@@ -5,7 +5,7 @@ import "testing"
 func TestNewCanvas(t *testing.T) {
 	h := 10
 	w := 20
-	canvas := NewCanvas(h, w)
+	canvas := NewCanvas(w, h)
 
 	if len(canvas.pixels) != h {
 		t.Errorf("NewCanvas: height of canvas should be %v but got %v", h, len(canvas.pixels))
