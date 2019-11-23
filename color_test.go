@@ -57,7 +57,7 @@ func TestMulColor(t *testing.T) {
 func TestFormat(t *testing.T) {
 	c := NewColor(1, 0.5, .25)
 	result := c.Format()
-	expected := "255 128 64"
+	expected := "255 128 64 "
 
 	if result != expected {
 		t.Errorf("ColorFormat: result '%v' should be '%v'", result, expected)
