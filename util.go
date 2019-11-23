@@ -30,13 +30,24 @@ func abs(n float64) float64 {
 }
 
 //Sum adds a sequence together
-func sum(nums ...float64) float64 {
+func sum(nums []float64) float64 {
 	result := 0.0
 
 	for _, v := range nums {
 		result += v
 	}
 	return result
+}
+
+//A[i] * B[i] + A[i + 1] * B[i + 1] ...
+func zipSum(A, B []float64) float64 {
+
+	ln := min(len(A), len(B))
+	total := 0.0
+	for i := 0; i < ln; i++ {
+		total += A[i] * B[i]
+	}
+	return total
 }
 
 //FloatToString converts a float to a String
