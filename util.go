@@ -1,6 +1,8 @@
 package main
 
-import "strconv"
+import (
+	"strconv"
+)
 
 //EPSILON is equivalence tolerance for float value comparison
 const EPSILON = 0.00001
