@@ -1,11 +1,13 @@
 package main
 
 import (
+	"math"
 	"strconv"
 )
 
 //EPSILON is equivalence tolerance for float value comparison
 const EPSILON = 0.00001
+const π = math.Pi
 
 //floatEqual determines if two floats are equal within a tolerance
 func floatEqual(a, b float64) bool {

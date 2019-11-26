@@ -4,14 +4,7 @@ package main
 type Matrix [][]float64
 
 //IdentityMatrix ...
-var IdentityMatrix = Matrix(
-	[][]float64{
-		[]float64{1, 0, 0, 0},
-		[]float64{0, 1, 0, 0},
-		[]float64{0, 0, 1, 0},
-		[]float64{0, 0, 0, 1},
-	},
-)
+var IdentityMatrix = NewIdentityMatrix()
 
 //NewMatrix creates a rowsXcols matrix
 func NewMatrix(rows, cols int) Matrix {
@@ -20,6 +13,18 @@ func NewMatrix(rows, cols int) Matrix {
 		matrix[i] = make([]float64, cols, cols)
 	}
 	return matrix
+}
+
+//NewIdentityMatrix creates a copy of the ID matrix
+func NewIdentityMatrix() Matrix {
+	return Matrix(
+		[][]float64{
+			[]float64{1, 0, 0, 0},
+			[]float64{0, 1, 0, 0},
+			[]float64{0, 0, 1, 0},
+			[]float64{0, 0, 0, 1},
+		},
+	)
 }
 
 //Set sets a value in a matrix
@@ -194,4 +199,18 @@ func (matrix Matrix) Inverse() Matrix {
 		}
 	}
 	return newM
+}
+
+//Clone returns a copy of the matrix
+func (matrix Matrix) Clone() Matrix {
+	h, w := matrix.Size()
+	newM := NewMatrix(h, w)
+
+	for i := 0; i < h; i++ {
+		for j := 0; j < w; j++ {
+			newM.Set(i, j, matrix.Get(i, j))
+		}
+	}
+	return newM
+
 }
