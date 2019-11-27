@@ -10,13 +10,14 @@ import (
 
 //Canvas is a canvas on which pixels are drawn
 type Canvas struct {
-	width, height int
-	pixels        [][]*Color
+	width, height    int
+	pixels           [][]*Color
+	originX, originY int
 }
 
 //NewCanvas creates a new canvas
 func NewCanvas(width int, height int) *Canvas {
-	canvas := &Canvas{width, height, make([][]*Color, height, height)}
+	canvas := &Canvas{width, height, make([][]*Color, height, height), 0, 0}
 	for y := 0; y < height; y++ {
 		canvas.pixels[y] = make([]*Color, width, width)
 		for x := 0; x < width; x++ {
@@ -24,6 +25,16 @@ func NewCanvas(width int, height int) *Canvas {
 		}
 	}
 	return canvas
+}
+
+//SetOrigin sets the origin of the canvas
+func (canvas *Canvas) SetOrigin(x, y int) {
+	if !canvas.checkBounds(x, y) {
+		return
+	}
+
+	canvas.originX = x
+	canvas.originY = y
 }
 
 func (canvas *Canvas) checkBounds(x, y int) bool {
@@ -54,6 +65,11 @@ func (canvas *Canvas) WritePixel(x, y int, c *Color) {
 		return
 	}
 	canvas.pixels[y][x] = NewColor(c.r, c.g, c.b)
+}
+
+//Write writes a point to a canvas
+func (canvas *Canvas) Write(point *Tuple, c *Color) {
+	canvas.WritePixel(int(point.x)+canvas.originX, (int(point.y) + canvas.originY), c)
 }
 
 //ToPPM writes the canvas to a PPM file

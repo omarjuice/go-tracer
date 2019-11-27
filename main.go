@@ -1,40 +1,34 @@
 package main
 
-import "fmt"
+import "time"
 
 func main() {
-	// fmt.Println("a"[-1])
-	// canvas := NewCanvas(900, 550)
-	// start := Point(0, 1, 0)
-	// velocity := Vector(1, 1.8, 0).Normalize().Mul(11.25)
-	// p := &Projectile{start, velocity}
 
-	// gravity := Vector(0, -0.1, 0)
-	// wind := Vector(-0.01, 0, 0)
+	colors := [3]*Color{NewColor(1, 0, 0), NewColor(0, 1, 0), NewColor(0, 0, 1)}
 
-	// e := &Environment{gravity, wind}
+	i := 0
 
-	// color := NewColor(0, 1, 0)
+	for {
+		color := colors[i]
+		i++
+		i %= 3
+		canvas := NewCanvas(400, 400)
 
-	// p.WriteToCanvas(canvas, color)
-	// i := 0
-	// for p.position.y >= 0.0 {
-	// 	p = Tick(e, p)
-	// 	p.WriteToCanvas(canvas, color)
-	// 	i++
-	// }
-	// fmt.Println(i)
+		canvas.SetOrigin(canvas.width/2, canvas.height/2)
 
-	// canvas.ToPPM("render")
+		origin := Point(0, 0, 0)
 
-	m := Matrix(
-		[][]float64{
-			[]float64{8, -5, 9, 2},
-			[]float64{7, 5, 6, 1},
-			[]float64{-6, 0, 9, 6},
-			[]float64{-3, 0, -9, -4},
-		},
-	)
+		canvas.Write(origin, NewColor(1, 1, 1))
 
-	fmt.Println(m.MulMatrix(m.Inverse()).Equals(IdentityMatrix))
+		current := origin.Transform(Translation(0, 150, 0))
+
+		for i := 0; i < 12; i++ {
+			current = current.Transform(RotationZ(π / 6))
+			canvas.Write(current, color)
+		}
+
+		canvas.ToPPM("clock")
+		time.Sleep(time.Second)
+	}
+
 }

@@ -203,3 +203,19 @@ func TestShearing(t *testing.T) {
 		t.Errorf("Shearing: zy expected %v to be %v", result, expected)
 	}
 }
+
+func TestChainTransformations(t *testing.T) {
+	p := Point(1, 0, 1)
+	A := RotationX(π / 2)
+	B := Scaling(5, 5, 5)
+	C := Translation(10, 5, 7)
+
+	result := p.Transform(A, B, C)
+
+	expected := Point(15, 0, 7)
+
+	if !result.Equals(expected) {
+		t.Errorf("ChainTransformations: expected %v to be %v", result, expected)
+	}
+
+}

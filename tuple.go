@@ -127,3 +127,20 @@ func (t *Tuple) String() string {
 	}
 	return start + floatToString(t.x) + "," + floatToString(t.y) + "," + floatToString(t.z) + ")"
 }
+
+//Transform chains multiple transformations together and applies them
+func (t *Tuple) Transform(transformations ...Matrix) *Tuple {
+
+	if len(transformations) < 1 {
+		return t
+	}
+
+	current := transformations[0]
+
+	for i := 1; i < len(transformations); i++ {
+		current = transformations[i].MulMatrix(current)
+	}
+
+	return current.MulTuple(t)
+
+}

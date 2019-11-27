@@ -67,3 +67,20 @@ func Shearing(xy, xz, yx, yz, zx, zy float64) Matrix {
 
 	return matrix
 }
+
+//ChainTransform chains multiple transformations together and applies them
+func ChainTransform(tuple *Tuple, transformations ...Matrix) *Tuple {
+
+	if len(transformations) < 1 {
+		return tuple
+	}
+
+	current := transformations[0]
+
+	for i := 1; i < len(transformations); i++ {
+		current = transformations[i].MulMatrix(current)
+	}
+
+	return current.MulTuple(tuple)
+
+}
