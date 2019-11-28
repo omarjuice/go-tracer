@@ -1,6 +1,8 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestRayPosition(t *testing.T) {
 	ray := NewRay(Point(2, 3, 4), Vector(1, 0, 0))
@@ -30,7 +32,7 @@ func TestIntersectSphere(t *testing.T) {
 
 	s := NewSphere()
 
-	xs := r.Intersect(s)
+	xs := s.Intersect(r)
 
 	if len(xs) != 2 {
 		t.Errorf("IntersectSphere: expected number of intersections to be %v but got %v", 2, len(xs))
@@ -45,7 +47,7 @@ func TestIntersectSphere(t *testing.T) {
 	}
 
 	r = NewRay(Point(0, 1, -5), Vector(0, 0, 1))
-	xs = r.Intersect(s)
+	xs = s.Intersect(r)
 
 	if len(xs) != 2 {
 		t.Errorf("IntersectSphere: expected number of intersections to be %v but got %v", 2, len(xs))
@@ -59,14 +61,14 @@ func TestIntersectSphere(t *testing.T) {
 	}
 
 	r = NewRay(Point(0, 2, -5), Vector(0, 0, 1))
-	xs = r.Intersect(s)
+	xs = s.Intersect(r)
 
 	if len(xs) != 0 {
 		t.Errorf("IntersectSphere: expected number of intersections to be %v but got %v", 0, len(xs))
 	}
 
 	r = NewRay(Point(0, 0, 5), Vector(0, 0, 1))
-	xs = r.Intersect(s)
+	xs = s.Intersect(r)
 
 	if len(xs) != 2 {
 		t.Errorf("IntersectSphere: expected number of intersections to be %v but got %v", 2, len(xs))
@@ -114,6 +116,47 @@ func TestHit(t *testing.T) {
 	i = xs.Hit()
 	if i != i4 {
 		t.Errorf("Hit: expected %v to be %v", i, i4)
+	}
+
+}
+
+func TestRayTransform(t *testing.T) {
+	r := NewRay(Point(1, 2, 3), Vector(0, 1, 0))
+	m := Translation(3, 4, 5)
+	r2 := r.Transform(m)
+	expected := NewRay(Point(4, 6, 8), Vector(0, 1, 0))
+
+	if !r2.Equals(expected) {
+		t.Errorf("RayTransform: expected %v to equal %v", r2, expected)
+	}
+
+	r = NewRay(Point(1, 2, 3), Vector(0, 1, 0))
+	m = Scaling(2, 3, 4)
+	r2 = r.Transform(m)
+	expected = NewRay(Point(2, 6, 12), Vector(0, 3, 0))
+	if !r2.Equals(expected) {
+		t.Errorf("RayTransform: expected %v to equal %v", r2, expected)
+	}
+
+	r = NewRay(Point(0, 0, -5), Vector(0, 0, 1))
+	s := NewSphere()
+	s.transform = Scaling(2, 2, 2)
+	xs := s.Intersect(r)
+
+	if len(xs) != 2 {
+		t.Errorf("RayTransform: expected number of intersections to be %v but got %v", 2, len(xs))
+	}
+	if !floatEqual(xs[0].t, 3) {
+		t.Errorf("RayTransform: expected %v to equal %v", xs[0].t, 3)
+	}
+	if !floatEqual(xs[1].t, 7) {
+		t.Errorf("RayTransform: expected %v to equal %v", xs[1].t, 7)
+	}
+
+	s.transform = Translation(5, 0, 0)
+	xs = s.Intersect(r)
+	if len(xs) != 0 {
+		t.Errorf("RayTransform: expected number of intersections to be %v but got %v", 0, len(xs))
 	}
 
 }

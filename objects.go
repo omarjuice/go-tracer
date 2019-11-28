@@ -1,6 +1,8 @@
 package main
 
-import "math"
+import (
+	"math"
+)
 
 //Object is any object in a scene
 type Object interface {
@@ -9,16 +11,18 @@ type Object interface {
 
 //Sphere object...
 type Sphere struct {
-	center *Tuple
+	center    *Tuple
+	transform Matrix
 }
 
 //NewSphere creates a new sphere
 func NewSphere() *Sphere {
-	return &Sphere{Point(0, 0, 0)}
+	return &Sphere{Point(0, 0, 0), IdentityMatrix}
 }
 
 //Intersect computes the intersection between a sphere and a ray
 func (sphere *Sphere) Intersect(ray *Ray) []*Intersection {
+	ray = ray.Transform(sphere.transform.Inverse())
 	sphereToRay := ray.origin.Sub(sphere.center)
 	a := ray.direction.Dot(ray.direction)
 	b := 2 * ray.direction.Dot(sphereToRay)
@@ -32,7 +36,6 @@ func (sphere *Sphere) Intersect(ray *Ray) []*Intersection {
 	sqrtDisc := math.Sqrt(discriminant)
 	t1 := (-b - sqrtDisc) / (2 * a)
 	t2 := (-b + sqrtDisc) / (2 * a)
-
 	return []*Intersection{&Intersection{t1, sphere}, &Intersection{t2, sphere}}
 
 }

@@ -16,6 +16,26 @@ func (ray *Ray) Position(t float64) *Tuple {
 }
 
 //Intersect calculates the intersection between a ray and an object
-func (ray *Ray) Intersect(object Object) []*Intersection {
-	return object.Intersect(ray)
+func (ray *Ray) Intersect(object Object) *Intersections {
+	intersections := object.Intersect(ray)
+
+	return &Intersections{intersections}
+}
+
+//Transform transforms a ray
+func (ray *Ray) Transform(transformations ...Matrix) *Ray {
+	return NewRay(
+		ray.origin.Transform(transformations...),
+		ray.direction.Transform(transformations...),
+	)
+}
+
+//Equals checks ray equality
+func (ray *Ray) Equals(other *Ray) bool {
+	return ray.origin.Equals(other.origin) && ray.direction.Equals(other.direction)
+}
+
+//String formats Ray as a string
+func (ray *Ray) String() string {
+	return "r(" + ray.origin.String() + ray.direction.String() + ")"
 }
