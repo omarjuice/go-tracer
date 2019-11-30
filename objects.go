@@ -6,24 +6,32 @@ import (
 
 //Object is any object in a scene
 type Object interface {
+	Material() *Material
 	Intersect(*Ray) []*Intersection
+	NormalAt(*Tuple) *Tuple
 }
 
 //Sphere object...
 type Sphere struct {
-	center    *Tuple
+	origin    *Tuple
 	transform Matrix
+	material  *Material
 }
 
 //NewSphere creates a new sphere
 func NewSphere() *Sphere {
-	return &Sphere{Point(0, 0, 0), IdentityMatrix}
+	return &Sphere{Point(0, 0, 0), IdentityMatrix, DefaultMaterial()}
+}
+
+//SetTransform sets the spheres transformation
+func (sphere *Sphere) SetTransform(transformation Matrix) {
+	sphere.transform = transformation.Inverse()
 }
 
 //Intersect computes the intersection between a sphere and a ray
 func (sphere *Sphere) Intersect(ray *Ray) []*Intersection {
-	ray = ray.Transform(sphere.transform.Inverse())
-	sphereToRay := ray.origin.Sub(sphere.center)
+	ray = ray.Transform(sphere.transform)
+	sphereToRay := ray.origin.Sub(sphere.origin)
 	a := ray.direction.Dot(ray.direction)
 	b := 2 * ray.direction.Dot(sphereToRay)
 	c := sphereToRay.Dot(sphereToRay) - 1
@@ -34,8 +42,24 @@ func (sphere *Sphere) Intersect(ray *Ray) []*Intersection {
 		return []*Intersection{}
 	}
 	sqrtDisc := math.Sqrt(discriminant)
-	t1 := (-b - sqrtDisc) / (2 * a)
-	t2 := (-b + sqrtDisc) / (2 * a)
+	div := (2 * a)
+	t1 := (-b - sqrtDisc) / div
+	t2 := (-b + sqrtDisc) / div
 	return []*Intersection{&Intersection{t1, sphere}, &Intersection{t2, sphere}}
 
+}
+
+//NormalAt calculates the normal(vector perpendicular to the surface) at a given point
+func (sphere *Sphere) NormalAt(point *Tuple) *Tuple {
+	objectPoint := sphere.transform.MulTuple(point)
+	objectNormal := objectPoint.Sub(sphere.origin)
+	worldNormal := sphere.transform.Transpose().MulTuple(objectNormal)
+
+	worldNormal.w = 0.0
+	return worldNormal.Normalize()
+}
+
+//Material returns the material of a Sphere
+func (sphere *Sphere) Material() *Material {
+	return sphere.material
 }

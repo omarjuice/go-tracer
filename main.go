@@ -36,12 +36,12 @@ func clock() {
 }
 
 func main() {
-
+	shinySphere()
 }
 
-func sphereCast() {
+func circleCast() {
 	start := time.Now()
-	canvas := NewCanvas(200, 200)
+	canvas := NewCanvas(1000, 1000)
 
 	rayOrigin := Point(0, 0, -5)
 	wallZ := 10.0
@@ -49,9 +49,10 @@ func sphereCast() {
 	pixelSize := wallSize / float64(canvas.width)
 
 	half := wallSize / 2
-	color := NewColor(1, 0, 0)
+	color := NewColor(0, 0, 1)
 	shape := NewSphere()
 	var wg sync.WaitGroup
+
 	for y := 0; y < (canvas.height); y++ {
 		wg.Add(1)
 		go func(y int) {
@@ -72,8 +73,61 @@ func sphereCast() {
 			wg.Done()
 		}(y)
 	}
+
 	wg.Wait()
 	fmt.Println(time.Now().Sub(start))
 
 	canvas.ToPPM("circle")
+}
+
+func shinySphere() {
+	start := time.Now()
+	canvas := NewCanvas(2000, 2000)
+
+	rayOrigin := Point(0, 0, -5)
+	wallZ := 10.0
+	wallSize := 7.0
+	pixelSize := wallSize / float64(canvas.width)
+
+	half := wallSize / 2
+
+	shape := NewSphere()
+	shape.material = DefaultMaterial()
+	shape.material.color = NewColor(1, .6, 0)
+	shape.SetTransform(Scaling(1, 1, 1))
+	light := NewPointLight(Point(-10, 10, -10), NewColor(1, 1, 1))
+	var wg sync.WaitGroup
+
+	for y := 0; y < (canvas.height); y++ {
+		wg.Add(1)
+		go func(y int) {
+			worldY := half - pixelSize*float64(y)
+			for x := 0; x < (canvas.width); x++ {
+				worldX := -half + pixelSize*float64(x)
+
+				position := Point(worldX, worldY, wallZ)
+				r := NewRay(rayOrigin, position.Sub(rayOrigin).Normalize())
+
+				xs := r.Intersect(shape)
+				hit := xs.Hit()
+				if hit != nil {
+
+					point := r.Position(hit.t)
+					normal := hit.object.NormalAt(point)
+					eye := r.direction.Negate()
+
+					color := Lighting(hit.object.Material(), light, point, eye, normal)
+
+					canvas.WritePixel(x, y, color)
+				}
+
+			}
+			wg.Done()
+		}(y)
+	}
+
+	wg.Wait()
+	fmt.Println(time.Now().Sub(start))
+
+	canvas.ToPPM("sphere")
 }

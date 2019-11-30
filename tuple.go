@@ -144,3 +144,8 @@ func (t *Tuple) Transform(transformations ...Matrix) *Tuple {
 	return current.MulTuple(t)
 
 }
+
+//Reflect reflects the  vector off of a normal
+func (t *Tuple) Reflect(normal *Tuple) *Tuple {
+	return t.Sub(normal.Mul(2).Mul(t.Dot(normal)))
+}

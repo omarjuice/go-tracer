@@ -140,7 +140,7 @@ func TestRayTransform(t *testing.T) {
 
 	r = NewRay(Point(0, 0, -5), Vector(0, 0, 1))
 	s := NewSphere()
-	s.transform = Scaling(2, 2, 2)
+	s.SetTransform(Scaling(2, 2, 2))
 	xs := s.Intersect(r)
 
 	if len(xs) != 2 {
@@ -153,7 +153,7 @@ func TestRayTransform(t *testing.T) {
 		t.Errorf("RayTransform: expected %v to equal %v", xs[1].t, 7)
 	}
 
-	s.transform = Translation(5, 0, 0)
+	s.SetTransform(Translation(5, 0, 0))
 	xs = s.Intersect(r)
 	if len(xs) != 0 {
 		t.Errorf("RayTransform: expected number of intersections to be %v but got %v", 0, len(xs))

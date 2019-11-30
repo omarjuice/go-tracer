@@ -74,7 +74,6 @@ func (canvas *Canvas) Write(point *Tuple, c *Color) {
 
 //ToPPM writes the canvas to a PPM file
 func (canvas *Canvas) ToPPM(filename string) {
-
 	lines := [][]rune{[]rune{}}
 
 	for y := 0; y < canvas.height; y++ {

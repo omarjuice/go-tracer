@@ -5,6 +5,12 @@ type Color struct {
 	r, g, b float64
 }
 
+//White ...
+var White = NewColor(1, 1, 1)
+
+//Black ...
+var Black = NewColor(0, 0, 0)
+
 //NewColor creates a new Color
 func NewColor(r, g, b float64) *Color {
 	return &Color{r, g, b}
