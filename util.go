@@ -1,6 +1,7 @@
 package main
 
 import (
+	"container/heap"
 	"math"
 	"strconv"
 )
@@ -46,7 +47,7 @@ func sum(nums []float64) float64 {
 //A[i] * B[i] + A[i + 1] * B[i + 1] ...
 func zipSum(A, B []float64) float64 {
 
-	ln := min(len(A), len(B))
+	ln := int(min(float64(len(A)), float64(len(B))))
 	total := 0.0
 	for i := 0; i < ln; i++ {
 		total += A[i] * B[i]
@@ -60,15 +61,89 @@ func floatToString(n float64) string {
 	return strconv.FormatFloat(n, 'f', 6, 64)[:3]
 }
 
-func min(a, b int) int {
+func min(a, b float64) float64 {
 	if b < a {
 		return b
 	}
 	return a
 }
-func max(a, b int) int {
+func max(a, b float64) float64 {
 	if b > a {
 		return b
 	}
 	return a
+}
+
+//PriorityQueue of intersections
+type PriorityQueue []*Intersection
+
+//Len gets length
+func (pq PriorityQueue) Len() int { return len(pq) }
+
+//Less is comparator
+func (pq PriorityQueue) Less(i, j int) bool {
+	// We want Pop to give us the highest, not lowest, priority so we use greater than here.
+	a, b := pq[i].t, pq[j].t
+
+	if a < 0 || b < 0 {
+		return a > b
+	}
+	return a < b
+
+}
+
+//Swap swaps two items
+func (pq PriorityQueue) Swap(i, j int) {
+	pq[i], pq[j] = pq[j], pq[i]
+	pq[i].index = i
+	pq[j].index = j
+}
+
+//Push adds an item to the pq
+func (pq *PriorityQueue) Push(x interface{}) {
+	n := len(*pq)
+	item := x.(*Intersection)
+	item.index = n
+	*pq = append(*pq, item)
+}
+
+//Pop removes the top item
+func (pq *PriorityQueue) Pop() interface{} {
+	old := *pq
+	n := len(old)
+	item := old[n-1]
+	old[n-1] = nil
+	item.index = -1
+	*pq = old[0 : n-1]
+	return item
+}
+
+// update modifies the priority and value of an Intersection in the queue.
+func (pq *PriorityQueue) update(intersection *Intersection, t float64) {
+	intersection.t = t
+	heap.Fix(pq, intersection.index)
+}
+
+func (pq *PriorityQueue) push(intersection *Intersection) int {
+	heap.Push(pq, intersection)
+	return pq.Len()
+}
+
+func (pq *PriorityQueue) pop() *Intersection {
+	return heap.Pop(pq).(*Intersection)
+}
+
+//Empty tells if the PQ is empty
+func (pq *PriorityQueue) Empty() bool {
+	return pq.Len() == 0
+}
+
+//Top returns the top element
+func (pq PriorityQueue) Top() *Intersection {
+	return pq[0]
+}
+
+//Init to initialize
+func (pq *PriorityQueue) Init() {
+	heap.Init(pq)
 }

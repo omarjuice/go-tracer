@@ -1,38 +1,44 @@
 package main
 
-import "sort"
-
 //Intersection ...
 type Intersection struct {
 	t      float64
 	object Object
+	index  int
 }
 
 //Intersections is a group of intersections
 type Intersections struct {
-	list []*Intersection
+	queue *PriorityQueue
 }
 
 //NewIntersections returns an Intersections
-func NewIntersections(intersections ...*Intersection) *Intersections {
-	return &Intersections{intersections}
+func NewIntersections(intersections []*Intersection) *Intersections {
+	pq := PriorityQueue(intersections)
+	pq.Init()
+
+	return &Intersections{&pq}
 }
 
 //Hit returns the object that the ray will Hit
 func (xs *Intersections) Hit() *Intersection {
-
-	sort.Slice(xs.list, func(i, j int) bool { return xs.list[i].t < xs.list[j].t })
-
-	for _, intersection := range xs.list {
-		if intersection.t >= 0 {
-			return intersection
-		}
+	if xs.queue.Empty() {
+		return nil
 	}
-	return nil
+	top := xs.queue.Top()
+	if top.t < 0 {
+		return nil
+	}
+	return top
 }
 
 //Add adds a new intersection to the group
 func (xs *Intersections) Add(intersection *Intersection) int {
-	xs.list = append(xs.list, intersection)
-	return len(xs.list)
+	xs.queue.push(intersection)
+	return xs.queue.Len()
+}
+
+//Count returns the size of the Intersections
+func (xs *Intersections) Count() int {
+	return xs.queue.Len()
 }

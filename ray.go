@@ -19,7 +19,7 @@ func (ray *Ray) Position(t float64) *Tuple {
 func (ray *Ray) Intersect(object Object) *Intersections {
 	intersections := object.Intersect(ray)
 
-	return &Intersections{intersections}
+	return NewIntersections(intersections)
 }
 
 //Transform transforms a ray

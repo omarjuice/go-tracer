@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"image"
+	"image/color"
+	"image/png"
 	"io"
 	"os"
 	"strconv"
@@ -109,6 +112,37 @@ func (canvas *Canvas) ToPPM(filename string) {
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+
+func convert(colorVal float64) uint8 {
+	r := uint8(max(min(colorVal*255, 255), 0))
+
+	return r
+}
+
+//ToPNG converts a canvas to a PNG
+func (canvas *Canvas) ToPNG(filename string) {
+	img := image.NewRGBA(image.Rectangle{image.Point{0, 0}, image.Point{canvas.width, canvas.height}})
+
+	for x := 0; x < canvas.width; x++ {
+		for y := 0; y < canvas.height; y++ {
+			c := canvas.PixelAt(x, y)
+			color := color.RGBA{convert(c.r), convert(c.g), convert(c.b), 1}
+			img.Set(x, y, color)
+		}
+	}
+
+	filename += ".png"
+
+	file, err := os.Open("/" + filename)
+
+	if err != nil {
+		file, _ = os.Create(filename)
+	}
+	defer file.Close()
+
+	png.Encode(file, img)
+
 }
 
 //String converts a canvas to a string

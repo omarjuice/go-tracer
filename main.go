@@ -34,14 +34,35 @@ func clock() {
 		time.Sleep(time.Second)
 	}
 }
-
 func main() {
+	// items := []float64{3, 1, 4, 5, 2}
+	// object := NewSphere()
+
+	// pq := make(PriorityQueue, len(items))
+	// for i, t := range items {
+	// 	pq[i] = &Intersection{
+	// 		t:      t,
+	// 		index:  i,
+	// 		object: object,
+	// 	}
+	// }
+	// heap.Init(&pq)
+
+	// item := &Intersection{10, object, -1}
+	// pq.push(item)
+	// pq.update(item, 0)
+
+	// for !pq.Empty() {
+	// 	item := pq.pop()
+	// 	fmt.Println(item.t, item.object)
+	// }
+
 	shinySphere()
 }
 
 func circleCast() {
 	start := time.Now()
-	canvas := NewCanvas(1000, 1000)
+	canvas := NewCanvas(100, 100)
 
 	rayOrigin := Point(0, 0, -5)
 	wallZ := 10.0
@@ -49,7 +70,7 @@ func circleCast() {
 	pixelSize := wallSize / float64(canvas.width)
 
 	half := wallSize / 2
-	color := NewColor(0, 0, 1)
+	color := NewColor(0, 1, 0)
 	shape := NewSphere()
 	var wg sync.WaitGroup
 
@@ -82,7 +103,7 @@ func circleCast() {
 
 func shinySphere() {
 	start := time.Now()
-	canvas := NewCanvas(2000, 2000)
+	canvas := NewCanvas(500, 500)
 
 	rayOrigin := Point(0, 0, -5)
 	wallZ := 10.0
@@ -93,9 +114,9 @@ func shinySphere() {
 
 	shape := NewSphere()
 	shape.material = DefaultMaterial()
-	shape.material.color = NewColor(1, .6, 0)
+	shape.material.color = NewColor(0, 1, 0)
 	shape.SetTransform(Scaling(1, 1, 1))
-	light := NewPointLight(Point(-10, 10, -10), NewColor(1, 1, 1))
+	light := NewPointLight(Point(-10, 10, -10), NewColor(1.0, 1.0, 1.0))
 	var wg sync.WaitGroup
 
 	for y := 0; y < (canvas.height); y++ {
