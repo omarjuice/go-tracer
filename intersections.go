@@ -20,6 +20,11 @@ func NewIntersections(intersections []*Intersection) *Intersections {
 	return &Intersections{&pq}
 }
 
+//NewIntersection creates a new Intersection
+func NewIntersection(t float64, object Object) *Intersection {
+	return &Intersection{t, object, -1}
+}
+
 //Hit returns the object that the ray will Hit
 func (xs *Intersections) Hit() *Intersection {
 	if xs.queue.Empty() {

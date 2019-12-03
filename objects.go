@@ -45,7 +45,7 @@ func (sphere *Sphere) Intersect(ray *Ray) []*Intersection {
 	div := (2 * a)
 	t1 := (-b - sqrtDisc) / div
 	t2 := (-b + sqrtDisc) / div
-	return []*Intersection{&Intersection{t1, sphere, -1}, &Intersection{t2, sphere, -1}}
+	return []*Intersection{NewIntersection(t1, sphere), NewIntersection(t2, sphere)}
 
 }
 

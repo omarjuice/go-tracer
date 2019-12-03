@@ -219,3 +219,51 @@ func TestChainTransformations(t *testing.T) {
 	}
 
 }
+
+func TestViewTransform(t *testing.T) {
+	from := Point(0, 0, 0)
+	to := Point(0, 0, -1)
+	up := Vector(0, 1, 0)
+
+	result := ViewTransform(from, to, up)
+	expected := IdentityMatrix
+
+	if !result.Equals(expected) {
+		t.Errorf("ViewTransform(default): expected %v to equal %v", result, expected)
+	}
+
+	from = Point(0, 0, 0)
+	to = Point(0, 0, 1)
+	up = Vector(0, 1, 0)
+	result = ViewTransform(from, to, up)
+	expected = Scaling(-1, 1, -1)
+
+	if !result.Equals(expected) {
+		t.Errorf("ViewTransform(positive z): expected %v to equal %v", result, expected)
+	}
+
+	from = Point(0, 0, 8)
+	to = Point(0, 0, 0)
+	up = Vector(0, 1, 0)
+	result = ViewTransform(from, to, up)
+	expected = Translation(0, 0, -8)
+
+	if !result.Equals(expected) {
+		t.Errorf("ViewTransform(moves world): expected %v to equal %v", result, expected)
+	}
+
+	from = Point(1, 3, 2)
+	to = Point(4, -2, 8)
+	up = Vector(1, 1, 0)
+	result = ViewTransform(from, to, up)
+	expected = [][]float64{
+		[]float64{-0.507093, 0.507093, 0.676123, -2.366432},
+		[]float64{0.767716, 0.606092, 0.121218, -2.828427},
+		[]float64{-0.358569, 0.597614, -0.717137, 0},
+		[]float64{0, 0, 0, 1},
+	}
+	if !result.Equals(expected) {
+		t.Errorf("ViewTransform(arbitary): expected %v to equal %v", result, expected)
+	}
+
+}

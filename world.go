@@ -2,13 +2,13 @@ package main
 
 //World creates an encapsulation of the objects and light
 type World struct {
-	light   *PointLight
+	lights  []*PointLight
 	objects []Object
 }
 
 //NewWorld ...
-func NewWorld(light *PointLight, objects []Object) *World {
-	return &World{light, objects}
+func NewWorld(lights []*PointLight, objects []Object) *World {
+	return &World{lights, objects}
 }
 
 //DefaultWorld ...
@@ -21,7 +21,7 @@ func DefaultWorld() *World {
 
 	s2 := NewSphere()
 	s2.SetTransform(Scaling(.5, .5, .5))
-	return NewWorld(light, []Object{s1, s2})
+	return NewWorld([]*PointLight{light}, []Object{s1, s2})
 }
 
 //Intersect a ray with the world
@@ -36,6 +36,25 @@ func (world *World) Intersect(ray *Ray) *Intersections {
 
 	return xs
 
+}
+
+//ShadeHit returns the color encapsulated by comps in the given world
+func (world *World) ShadeHit(comps *Computation) *Color {
+	light := Lighting(comps.object.Material(), world.lights[0], comps.point, comps.eyev, comps.normalv)
+	for i := 1; i < len(world.lights); i++ {
+		light = light.Add(Lighting(comps.object.Material(), world.lights[i], comps.point, comps.eyev, comps.normalv))
+	}
+	return light
+}
+
+//ColorAt ...
+func (world *World) ColorAt(ray *Ray) *Color {
+	hit := world.Intersect(ray).Hit()
+	if hit == nil {
+		return Black
+	}
+	comps := PrepareComputations(hit, ray)
+	return world.ShadeHit(comps)
 }
 
 //Computation ...
