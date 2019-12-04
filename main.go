@@ -35,29 +35,7 @@ func clock() {
 	}
 }
 func main() {
-	// items := []float64{3, 1, 4, 5, 2}
-	// object := NewSphere()
-
-	// pq := make(PriorityQueue, len(items))
-	// for i, t := range items {
-	// 	pq[i] = &Intersection{
-	// 		t:      t,
-	// 		index:  i,
-	// 		object: object,
-	// 	}
-	// }
-	// heap.Init(&pq)
-
-	// item := &Intersection{10, object, -1}
-	// pq.push(item)
-	// pq.update(item, 0)
-
-	// for !pq.Empty() {
-	// 	item := pq.pop()
-	// 	fmt.Println(item.t, item.object)
-	// }
-
-	shinySphere()
+	threeSpheres(500, 250)
 }
 
 func circleCast() {
@@ -151,4 +129,55 @@ func shinySphere() {
 	fmt.Println(time.Now().Sub(start))
 
 	canvas.ToPPM("sphere")
+}
+func threeSpheres(width, height int) {
+
+	start := time.Now()
+
+	floor := NewSphere()
+	floor.SetTransform(Scaling(10, 0.01, 10))
+	floor.material.color = NewColor(1, 1, 1)
+	floor.material.specular = 0
+	floor.material.diffuse = 0.5
+	floor.material.shininess = 200
+
+	leftWall := NewSphere()
+	leftWall.SetTransform(Translation(0, 0, 5).MulMatrix(RotationY(-π / 4)).MulMatrix(RotationX(π / 2)).MulMatrix(Scaling(10, 0.01, 10)))
+	leftWall.material = floor.material
+
+	rightWall := NewSphere()
+	rightWall.SetTransform(Translation(0, 0, 5).MulMatrix(RotationY(π / 4)).MulMatrix(RotationX(π / 2)).MulMatrix(Scaling(10, 0.01, 10)))
+	rightWall.material = floor.material
+
+	middle := NewSphere()
+	middle.SetTransform(Translation(-0.5, 1, 0.5))
+	middle.material.color = NewColor(0.1, 1, 0.5)
+	middle.material.diffuse = 0.7
+	middle.material.specular = 0.3
+
+	right := NewSphere()
+	right.SetTransform(Translation(1.5, 0.5, -0.5).MulMatrix(Scaling(0.5, 0.5, 0.5)))
+	right.material.color = NewColor(0.5, 1, 0.1)
+	right.material.diffuse = 0.7
+	right.material.specular = 0.3
+
+	left := NewSphere()
+	left.SetTransform(Translation(-1.5, 0.33, -0.75).MulMatrix(Scaling(0.33, 0.33, 0.33)))
+	left.material.color = NewColor(1, 0.8, 0.1)
+	left.material.diffuse = 0.7
+	left.material.specular = 0.3
+
+	lights := []*PointLight{
+		NewPointLight(Point(-10, 10, -10), NewColor(1, 1, 1)),
+	}
+	world := NewWorld(lights, []Object{middle, left, right, floor, leftWall, rightWall})
+
+	camera := NewCamera(width, height, π/3)
+	camera.SetTransform(ViewTransform(Point(0, 1.5, -5), Point(0, 1, 0), Vector(0, 1, 0)))
+
+	canvas := camera.Render(world)
+
+	fmt.Println(time.Now().Sub(start))
+
+	canvas.ToPPM("world")
 }
