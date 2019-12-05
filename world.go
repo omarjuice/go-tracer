@@ -40,9 +40,9 @@ func (world *World) Intersect(ray *Ray) *Intersections {
 
 //ShadeHit returns the color encapsulated by comps in the given world
 func (world *World) ShadeHit(comps *Computation) *Color {
-	light := Lighting(comps.object.Material(), world.lights[0], comps.point, comps.eyev, comps.normalv)
+	light := Lighting(comps.object.Material(), world.lights[0], comps.point, comps.eyev, comps.normalv, world.IsShadowed(comps.overPoint, 0))
 	for i := 1; i < len(world.lights); i++ {
-		light = light.Add(Lighting(comps.object.Material(), world.lights[i], comps.point, comps.eyev, comps.normalv))
+		light = light.Add(Lighting(comps.object.Material(), world.lights[i], comps.point, comps.eyev, comps.normalv, world.IsShadowed(comps.overPoint, i)))
 	}
 	return light
 }
@@ -57,28 +57,45 @@ func (world *World) ColorAt(ray *Ray) *Color {
 	return world.ShadeHit(comps)
 }
 
+//IsShadowed returns whether a point is in a shadow
+func (world *World) IsShadowed(point *Tuple, light int) bool {
+	v := world.lights[light].position.Sub(point)
+	distance := v.Magnitude()
+	direction := v.Normalize()
+
+	ray := NewRay(point, direction)
+
+	intersections := world.Intersect(ray)
+
+	hit := intersections.Hit()
+
+	return hit != nil && hit.t < distance
+}
+
 //Computation ...
 type Computation struct {
-	t                    float64
-	object               Object
-	point, eyev, normalv *Tuple
-	inside               bool
+	t                               float64
+	object                          Object
+	point, eyev, normalv, overPoint *Tuple
+	inside                          bool
 }
 
 //PrepareComputations ...
 func PrepareComputations(intersection *Intersection, ray *Ray) *Computation {
 	point := ray.Position(intersection.t)
 	comps := &Computation{
-		t:       intersection.t,
-		object:  intersection.object,
-		point:   point,
-		eyev:    ray.direction.Negate(),
-		normalv: intersection.object.NormalAt(point),
-		inside:  false,
+		t:         intersection.t,
+		object:    intersection.object,
+		point:     point,
+		overPoint: nil,
+		eyev:      ray.direction.Negate(),
+		normalv:   intersection.object.NormalAt(point),
+		inside:    false,
 	}
 	if comps.normalv.Dot(comps.eyev) < 0 {
 		comps.inside = true
 		comps.normalv = comps.normalv.Negate()
 	}
+	comps.overPoint = comps.point.Add(comps.normalv.Mul(EPSILON))
 	return comps
 }

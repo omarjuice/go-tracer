@@ -31,7 +31,7 @@ func NewMaterial(color *Color, ambient, diffuse, specular, shininess float64) *M
 }
 
 //Lighting computes lighting
-func Lighting(material *Material, light *PointLight, point, eyev, normalv *Tuple) *Color {
+func Lighting(material *Material, light *PointLight, point, eyev, normalv *Tuple, inShadow bool) *Color {
 	effectiveColor := material.color.Mul(light.intensity)
 
 	lightv := light.position.Sub(point).Normalize()
@@ -55,5 +55,9 @@ func Lighting(material *Material, light *PointLight, point, eyev, normalv *Tuple
 		}
 	}
 
+	if inShadow {
+		return ambient
+	}
 	return ambient.Add(diffuse).Add(specular)
+
 }

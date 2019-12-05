@@ -96,6 +96,25 @@ func TestShadeHit(t *testing.T) {
 	if !result.Equals(expected) {
 		t.Errorf("ShadeHit: expected %v to be %v", result, expected)
 	}
+
+	s1 := NewSphere()
+	s2 := NewSphere()
+	s2.SetTransform(Translation(0, 0, 10))
+
+	w = NewWorld(
+		[]*PointLight{NewPointLight(Point(0, 0, -10), NewColor(1, 1, 1))},
+		[]Object{s1, s2},
+	)
+	r = NewRay(Point(0, 0, 5), Vector(0, 0, 1))
+	i = NewIntersection(4, s2)
+
+	comps = PrepareComputations(i, r)
+	result = w.ShadeHit(comps)
+	expected = NewColor(0.1, 0.1, 0.1)
+
+	if !result.Equals(expected) {
+		t.Errorf("ShadeHit: expected %v to be %v", result, expected)
+	}
 }
 
 func TestWorldColorAt(t *testing.T) {
@@ -129,6 +148,31 @@ func TestWorldColorAt(t *testing.T) {
 
 	if !result.Equals(expected) {
 		t.Errorf("WorldColorAt (hit inner): expected %v to be %v", result, expected)
+	}
+
+}
+
+func TestIsShadowed(t *testing.T) {
+	w := DefaultWorld()
+
+	p := Point(0, 10, 0)
+	if w.IsShadowed(p, 0) {
+		t.Errorf("IsShadowed: expected no shadow when nothing is collinear point and light")
+	}
+
+	p = Point(10, -10, 10)
+	if !w.IsShadowed(p, 0) {
+		t.Errorf("IsShadowed: expected object between point and light to create shadow")
+	}
+
+	p = Point(-20, 20, -20)
+	if w.IsShadowed(p, 0) {
+		t.Errorf("IsShadowed: There should be no shadow when an object is behind the light")
+	}
+
+	p = Point(-2, 2, -2)
+	if w.IsShadowed(p, 0) {
+		t.Errorf("IsShadowed: There is no shadow when an object is behind the point ")
 	}
 
 }

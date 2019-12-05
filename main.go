@@ -35,7 +35,7 @@ func clock() {
 	}
 }
 func main() {
-	threeSpheres(500, 250)
+	threeSpheres(1000, 500)
 }
 
 func circleCast() {
@@ -115,7 +115,7 @@ func shinySphere() {
 					normal := hit.object.NormalAt(point)
 					eye := r.direction.Negate()
 
-					color := Lighting(hit.object.Material(), light, point, eye, normal)
+					color := Lighting(hit.object.Material(), light, point, eye, normal, false)
 
 					canvas.WritePixel(x, y, color)
 				}
@@ -169,6 +169,7 @@ func threeSpheres(width, height int) {
 
 	lights := []*PointLight{
 		NewPointLight(Point(-10, 10, -10), NewColor(1, 1, 1)),
+		NewPointLight(Point(0, 10, 0), NewColor(0.5, 0.5, 0.5)),
 	}
 	world := NewWorld(lights, []Object{middle, left, right, floor, leftWall, rightWall})
 
