@@ -103,7 +103,7 @@ func TestShadeHit(t *testing.T) {
 
 	w = NewWorld(
 		[]*PointLight{NewPointLight(Point(0, 0, -10), NewColor(1, 1, 1))},
-		[]Object{s1, s2},
+		[]Shape{s1, s2},
 	)
 	r = NewRay(Point(0, 0, 5), Vector(0, 0, 1))
 	i = NewIntersection(4, s2)

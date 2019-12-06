@@ -4,8 +4,11 @@ import (
 	"math"
 )
 
-//Object is any object in a scene
-type Object interface {
+//Shape is any object in a scene
+type Shape interface {
+	SetMaterial(*Material)
+	SetTransform(Matrix)
+	Transform() Matrix
 	Material() *Material
 	Intersect(*Ray) []*Intersection
 	NormalAt(*Tuple) *Tuple
@@ -23,9 +26,24 @@ func NewSphere() *Sphere {
 	return &Sphere{Point(0, 0, 0), IdentityMatrix, DefaultMaterial()}
 }
 
+//Material returns the material of a Sphere
+func (sphere *Sphere) Material() *Material {
+	return sphere.material
+}
+
+//Transform returns the transformation
+func (sphere *Sphere) Transform() Matrix {
+	return sphere.transform
+}
+
 //SetTransform sets the spheres transformation
 func (sphere *Sphere) SetTransform(transformation Matrix) {
 	sphere.transform = transformation.Inverse()
+}
+
+//SetMaterial sets the spheres material
+func (sphere *Sphere) SetMaterial(material *Material) {
+	sphere.material = material
 }
 
 //Intersect computes the intersection between a sphere and a ray
@@ -59,7 +77,50 @@ func (sphere *Sphere) NormalAt(point *Tuple) *Tuple {
 	return worldNormal.Normalize()
 }
 
-//Material returns the material of a Sphere
-func (sphere *Sphere) Material() *Material {
-	return sphere.material
+//Plane Shape
+type Plane struct {
+	transform Matrix
+	material  *Material
+}
+
+//NewPlane ...
+func NewPlane() *Plane {
+	return &Plane{NewIdentityMatrix(), DefaultMaterial()}
+
+}
+
+//Transform ...
+func (plane *Plane) Transform() Matrix {
+	return plane.transform
+}
+
+//Material ...
+func (plane *Plane) Material() *Material {
+	return plane.material
+}
+
+//SetTransform ...
+func (plane *Plane) SetTransform(transform Matrix) {
+	plane.transform = transform.Inverse()
+}
+
+//SetMaterial ...
+func (plane *Plane) SetMaterial(material *Material) {
+	plane.material = material
+}
+
+//Intersect ...
+func (plane *Plane) Intersect(ray *Ray) []*Intersection {
+	if abs(ray.direction.y) < EPSILON {
+		return []*Intersection{}
+	}
+	ray = ray.Transform(plane.transform)
+	t := -ray.origin.y / ray.direction.y
+
+	return []*Intersection{NewIntersection(t, plane)}
+}
+
+//NormalAt ...
+func (plane *Plane) NormalAt(point *Tuple) *Tuple {
+	return Vector(0, 1, 0)
 }

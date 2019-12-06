@@ -16,7 +16,7 @@ func (ray *Ray) Position(t float64) *Tuple {
 }
 
 //Intersect calculates the intersection between a ray and an object
-func (ray *Ray) Intersect(object Object) *Intersections {
+func (ray *Ray) Intersect(object Shape) *Intersections {
 	intersections := object.Intersect(ray)
 
 	return NewIntersections(intersections)

@@ -3,7 +3,7 @@ package main
 //Intersection ...
 type Intersection struct {
 	t      float64
-	object Object
+	object Shape
 	index  int
 }
 
@@ -21,7 +21,7 @@ func NewIntersections(intersections []*Intersection) *Intersections {
 }
 
 //NewIntersection creates a new Intersection
-func NewIntersection(t float64, object Object) *Intersection {
+func NewIntersection(t float64, object Shape) *Intersection {
 	return &Intersection{t, object, -1}
 }
 

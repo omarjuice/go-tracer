@@ -35,7 +35,7 @@ func clock() {
 	}
 }
 func main() {
-	threeSpheres(1000, 500)
+	planar(500, 250)
 }
 
 func circleCast() {
@@ -171,7 +171,7 @@ func threeSpheres(width, height int) {
 		NewPointLight(Point(-10, 10, -10), NewColor(1, 1, 1)),
 		NewPointLight(Point(0, 10, 0), NewColor(0.5, 0.5, 0.5)),
 	}
-	world := NewWorld(lights, []Object{middle, left, right, floor, leftWall, rightWall})
+	world := NewWorld(lights, []Shape{middle, left, right, floor, leftWall, rightWall})
 
 	camera := NewCamera(width, height, π/3)
 	camera.SetTransform(ViewTransform(Point(0, 1.5, -5), Point(0, 1, 0), Vector(0, 1, 0)))
@@ -181,4 +181,24 @@ func threeSpheres(width, height int) {
 	fmt.Println(time.Now().Sub(start))
 
 	canvas.ToPPM("world")
+}
+
+func planar(width, height int) {
+	start := time.Now()
+	lights := []*PointLight{
+		NewPointLight(Point(-10, 10, -10), NewColor(1, 1, 1)),
+		NewPointLight(Point(0, 10, 0), NewColor(0.5, 0.5, 0.5)),
+	}
+	p1 := NewPlane()
+	world := NewWorld(lights, []Shape{p1})
+
+	camera := NewCamera(width, height, π/3)
+	camera.SetTransform(ViewTransform(Point(0, 1.5, -5), Point(0, 1, 0), Vector(0, 1, 0)))
+
+	canvas := camera.Render(world)
+
+	fmt.Println(time.Now().Sub(start))
+
+	canvas.ToPPM("planar")
+
 }

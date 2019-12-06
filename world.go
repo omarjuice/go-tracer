@@ -3,11 +3,11 @@ package main
 //World creates an encapsulation of the objects and light
 type World struct {
 	lights  []*PointLight
-	objects []Object
+	objects []Shape
 }
 
 //NewWorld ...
-func NewWorld(lights []*PointLight, objects []Object) *World {
+func NewWorld(lights []*PointLight, objects []Shape) *World {
 	return &World{lights, objects}
 }
 
@@ -21,7 +21,7 @@ func DefaultWorld() *World {
 
 	s2 := NewSphere()
 	s2.SetTransform(Scaling(.5, .5, .5))
-	return NewWorld([]*PointLight{light}, []Object{s1, s2})
+	return NewWorld([]*PointLight{light}, []Shape{s1, s2})
 }
 
 //Intersect a ray with the world
@@ -75,7 +75,7 @@ func (world *World) IsShadowed(point *Tuple, light int) bool {
 //Computation ...
 type Computation struct {
 	t                               float64
-	object                          Object
+	object                          Shape
 	point, eyev, normalv, overPoint *Tuple
 	inside                          bool
 }
