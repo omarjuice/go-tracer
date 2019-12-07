@@ -35,7 +35,7 @@ func clock() {
 	}
 }
 func main() {
-	planar(500, 250)
+	threeSpheres(1000, 500)
 }
 
 func circleCast() {
@@ -115,7 +115,7 @@ func shinySphere() {
 					normal := hit.object.NormalAt(point)
 					eye := r.direction.Negate()
 
-					color := Lighting(hit.object.Material(), light, point, eye, normal, false)
+					color := Lighting(hit.object.Material(), hit.object, light, point, eye, normal, false)
 
 					canvas.WritePixel(x, y, color)
 				}
@@ -136,6 +136,8 @@ func threeSpheres(width, height int) {
 
 	floor := NewSphere()
 	floor.SetTransform(Scaling(10, 0.01, 10))
+	floor.material.pattern = PatternChain(CheckersPattern(White, Black), GradientPattern(NewColor(1, 0, 0), NewColor(0, 0, 1)))
+	floor.material.pattern.SetTransform((Scaling(.01, .01, .01)))
 	floor.material.color = NewColor(1, 1, 1)
 	floor.material.specular = 0
 	floor.material.diffuse = 0.5
@@ -151,18 +153,23 @@ func threeSpheres(width, height int) {
 
 	middle := NewSphere()
 	middle.SetTransform(Translation(-0.5, 1, 0.5))
+	middle.material.pattern = GradientPattern(NewColor(1, 0, 0), NewColor(0, 0, 1))
+	middle.material.pattern.SetTransform(Scaling(0.5, 0.5, 0.5))
 	middle.material.color = NewColor(0.1, 1, 0.5)
 	middle.material.diffuse = 0.7
 	middle.material.specular = 0.3
 
 	right := NewSphere()
 	right.SetTransform(Translation(1.5, 0.5, -0.5).MulMatrix(Scaling(0.5, 0.5, 0.5)))
+	right.material.pattern = CheckersPattern(NewColor(1, .4, .6), NewColor(0, 1, 1))
+	right.material.pattern.SetTransform(Scaling(0.2, 0.2, 0.2))
 	right.material.color = NewColor(0.5, 1, 0.1)
 	right.material.diffuse = 0.7
 	right.material.specular = 0.3
 
 	left := NewSphere()
 	left.SetTransform(Translation(-1.5, 0.33, -0.75).MulMatrix(Scaling(0.33, 0.33, 0.33)))
+	left.material.pattern = PatternChain(middle.material.pattern, right.material.pattern)
 	left.material.color = NewColor(1, 0.8, 0.1)
 	left.material.diffuse = 0.7
 	left.material.specular = 0.3

@@ -1,6 +1,8 @@
 package main
 
-import "math"
+import (
+	"math"
+)
 
 //PointLight is a light source with no size, existing at a single point in space
 type PointLight struct {
@@ -15,24 +17,32 @@ func NewPointLight(position *Tuple, intensity *Color) *PointLight {
 
 //Material encapsulates the given attributes of the Phong reflection model
 type Material struct {
-	color *Color
-
+	color                                 *Color
 	ambient, diffuse, specular, shininess float64
+	pattern                               *Pattern
 }
 
 //DefaultMaterial ...
 func DefaultMaterial() *Material {
-	return NewMaterial(White, 0.1, .9, .9, 200.0)
+	return NewMaterial(White, 0.1, .9, .9, 200.0, nil)
 }
 
 //NewMaterial creates a new Materials
-func NewMaterial(color *Color, ambient, diffuse, specular, shininess float64) *Material {
-	return &Material{color, ambient, diffuse, specular, shininess}
+func NewMaterial(color *Color, ambient, diffuse, specular, shininess float64, pattern *Pattern) *Material {
+	return &Material{color, ambient, diffuse, specular, shininess, pattern}
 }
 
 //Lighting computes lighting
-func Lighting(material *Material, light *PointLight, point, eyev, normalv *Tuple, inShadow bool) *Color {
-	effectiveColor := material.color.Mul(light.intensity)
+func Lighting(material *Material, object Shape, light *PointLight, point, eyev, normalv *Tuple, inShadow bool) *Color {
+
+	var color *Color
+	if material.pattern != nil {
+		color = material.pattern.ColorAtObject(object, point)
+	} else {
+		color = material.color
+	}
+
+	effectiveColor := color.Mul(light.intensity)
 
 	lightv := light.position.Sub(point).Normalize()
 

@@ -40,9 +40,9 @@ func (world *World) Intersect(ray *Ray) *Intersections {
 
 //ShadeHit returns the color encapsulated by comps in the given world
 func (world *World) ShadeHit(comps *Computation) *Color {
-	light := Lighting(comps.object.Material(), world.lights[0], comps.point, comps.eyev, comps.normalv, world.IsShadowed(comps.overPoint, 0))
+	light := Lighting(comps.object.Material(), comps.object, world.lights[0], comps.point, comps.eyev, comps.normalv, world.IsShadowed(comps.overPoint, 0))
 	for i := 1; i < len(world.lights); i++ {
-		light = light.Add(Lighting(comps.object.Material(), world.lights[i], comps.point, comps.eyev, comps.normalv, world.IsShadowed(comps.overPoint, i)))
+		light = light.Add(Lighting(comps.object.Material(), comps.object, world.lights[i], comps.point, comps.eyev, comps.normalv, world.IsShadowed(comps.overPoint, i)))
 	}
 	return light
 }
