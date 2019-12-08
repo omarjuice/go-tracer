@@ -85,7 +85,7 @@ type Plane struct {
 
 //NewPlane ...
 func NewPlane() *Plane {
-	return &Plane{NewIdentityMatrix(), DefaultMaterial()}
+	return &Plane{IdentityMatrix, DefaultMaterial()}
 
 }
 
@@ -122,5 +122,9 @@ func (plane *Plane) Intersect(ray *Ray) []*Intersection {
 
 //NormalAt ...
 func (plane *Plane) NormalAt(point *Tuple) *Tuple {
-	return Vector(0, 1, 0)
+	localNormal := Vector(0, 1, 0)
+	worldNormal := plane.transform.Transpose().MulTuple(localNormal)
+	worldNormal.w = 0
+	return worldNormal.Normalize()
+
 }

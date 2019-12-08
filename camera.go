@@ -58,7 +58,7 @@ func (cam *Camera) RayForPixel(x, y int) *Ray {
 }
 
 //Render renders the image of a given world on a canavs from the view of the camera
-func (cam *Camera) Render(world *World) *Canvas {
+func (cam *Camera) Render(world *World, recursionDepth int) *Canvas {
 	image := NewCanvas(cam.hsize, cam.vsize)
 
 	var wg sync.WaitGroup
@@ -68,7 +68,7 @@ func (cam *Camera) Render(world *World) *Canvas {
 		go func(y int) {
 			for x := 0; x < cam.hsize; x++ {
 				ray := cam.RayForPixel(x, y)
-				color := world.ColorAt(ray)
+				color := world.ColorAt(ray, recursionDepth)
 				image.WritePixel(x, y, color)
 			}
 			wg.Done()

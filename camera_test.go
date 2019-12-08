@@ -57,7 +57,7 @@ func TestCameraRender(t *testing.T) {
 	to := Point(0, 0, 0)
 	up := Vector(0, 1, 0)
 	c.SetTransform(ViewTransform(from, to, up))
-	image := c.Render(w)
+	image := c.Render(w, 10)
 
 	expected := NewColor(0.38066, 0.47583, 0.2855)
 

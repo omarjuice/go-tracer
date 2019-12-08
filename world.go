@@ -39,22 +39,40 @@ func (world *World) Intersect(ray *Ray) *Intersections {
 }
 
 //ShadeHit returns the color encapsulated by comps in the given world
-func (world *World) ShadeHit(comps *Computation) *Color {
-	light := Lighting(comps.object.Material(), comps.object, world.lights[0], comps.point, comps.eyev, comps.normalv, world.IsShadowed(comps.overPoint, 0))
-	for i := 1; i < len(world.lights); i++ {
-		light = light.Add(Lighting(comps.object.Material(), comps.object, world.lights[i], comps.point, comps.eyev, comps.normalv, world.IsShadowed(comps.overPoint, i)))
+func (world *World) ShadeHit(comps *Computation, remaining int) *Color {
+	light := Black
+	for i := 0; i < len(world.lights); i++ {
+		light = light.Add(Lighting(
+			comps.object.Material(),
+			comps.object,
+			world.lights[i],
+			comps.overPoint,
+			comps.eyev,
+			comps.normalv,
+			world.IsShadowed(comps.overPoint, i))).Add(world.ReflectedColor(comps, remaining))
 	}
 	return light
 }
 
 //ColorAt ...
-func (world *World) ColorAt(ray *Ray) *Color {
+func (world *World) ColorAt(ray *Ray, remaining int) *Color {
 	hit := world.Intersect(ray).Hit()
 	if hit == nil {
 		return Black
 	}
 	comps := PrepareComputations(hit, ray)
-	return world.ShadeHit(comps)
+	return world.ShadeHit(comps, remaining)
+}
+
+//ReflectedColor ...
+func (world *World) ReflectedColor(comps *Computation, remaining int) *Color {
+	if comps.object.Material().reflective == 0.0 || remaining < 1 {
+		return Black
+	}
+	reflectRay := NewRay(comps.overPoint, comps.reflectv)
+	color := world.ColorAt(reflectRay, remaining-1)
+
+	return color.MulScalar(comps.object.Material().reflective)
 }
 
 //IsShadowed returns whether a point is in a shadow
@@ -74,28 +92,28 @@ func (world *World) IsShadowed(point *Tuple, light int) bool {
 
 //Computation ...
 type Computation struct {
-	t                               float64
-	object                          Shape
-	point, eyev, normalv, overPoint *Tuple
-	inside                          bool
+	t                                         float64
+	object                                    Shape
+	point, eyev, normalv, reflectv, overPoint *Tuple
+	inside                                    bool
 }
 
 //PrepareComputations ...
 func PrepareComputations(intersection *Intersection, ray *Ray) *Computation {
 	point := ray.Position(intersection.t)
 	comps := &Computation{
-		t:         intersection.t,
-		object:    intersection.object,
-		point:     point,
-		overPoint: nil,
-		eyev:      ray.direction.Negate(),
-		normalv:   intersection.object.NormalAt(point),
-		inside:    false,
+		t:       intersection.t,
+		object:  intersection.object,
+		point:   point,
+		eyev:    ray.direction.Negate(),
+		normalv: intersection.object.NormalAt(point),
+		inside:  false,
 	}
 	if comps.normalv.Dot(comps.eyev) < 0 {
 		comps.inside = true
 		comps.normalv = comps.normalv.Negate()
 	}
+	comps.reflectv = ray.direction.Reflect(comps.normalv)
 	comps.overPoint = comps.point.Add(comps.normalv.Mul(EPSILON))
 	return comps
 }

@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+const defaultRecursionDepth = 4
+
 func clock() {
 	colors := [3]*Color{NewColor(1, 0, 0), NewColor(0, 1, 0), NewColor(0, 0, 1)}
 
@@ -35,7 +37,7 @@ func clock() {
 	}
 }
 func main() {
-	threeSpheres(1000, 500)
+	threeSpheres(2000, 1000)
 }
 
 func circleCast() {
@@ -134,56 +136,63 @@ func threeSpheres(width, height int) {
 
 	start := time.Now()
 
-	floor := NewSphere()
+	floor := NewPlane()
 	floor.SetTransform(Scaling(10, 0.01, 10))
-	floor.material.pattern = PatternChain(CheckersPattern(White, Black), GradientPattern(NewColor(1, 0, 0), NewColor(0, 0, 1)))
-	floor.material.pattern.SetTransform((Scaling(.01, .01, .01)))
+	floor.material.pattern = CheckersPattern(White, Black)
+	floor.material.pattern.SetTransform((Scaling(.1, .1, .1)))
 	floor.material.color = NewColor(1, 1, 1)
-	floor.material.specular = 0
+	floor.material.specular = 0.3
 	floor.material.diffuse = 0.5
 	floor.material.shininess = 200
 
-	leftWall := NewSphere()
+	leftWall := NewPlane()
 	leftWall.SetTransform(Translation(0, 0, 5).MulMatrix(RotationY(-π / 4)).MulMatrix(RotationX(π / 2)).MulMatrix(Scaling(10, 0.01, 10)))
 	leftWall.material = floor.material
 
-	rightWall := NewSphere()
+	rightWall := NewPlane()
 	rightWall.SetTransform(Translation(0, 0, 5).MulMatrix(RotationY(π / 4)).MulMatrix(RotationX(π / 2)).MulMatrix(Scaling(10, 0.01, 10)))
 	rightWall.material = floor.material
 
+	backWall := NewPlane()
+	backWall.SetTransform(Translation(0, 0, -6).MulMatrix(RotationX(π / 2)))
+	backWall.material = floor.material
+
 	middle := NewSphere()
 	middle.SetTransform(Translation(-0.5, 1, 0.5))
-	middle.material.pattern = GradientPattern(NewColor(1, 0, 0), NewColor(0, 0, 1))
-	middle.material.pattern.SetTransform(Scaling(0.5, 0.5, 0.5))
-	middle.material.color = NewColor(0.1, 1, 0.5)
+	// middle.material.pattern = GradientPattern(NewColor(1, 0, 0), NewColor(0, 0, 1))
+	// middle.material.pattern.SetTransform(Scaling(0.5, 0.5, 0.5))
+	middle.material.color = NewColor(0.5, 0.5, 0.5)
 	middle.material.diffuse = 0.7
 	middle.material.specular = 0.3
+	middle.material.reflective = .5
 
 	right := NewSphere()
 	right.SetTransform(Translation(1.5, 0.5, -0.5).MulMatrix(Scaling(0.5, 0.5, 0.5)))
-	right.material.pattern = CheckersPattern(NewColor(1, .4, .6), NewColor(0, 1, 1))
-	right.material.pattern.SetTransform(Scaling(0.2, 0.2, 0.2))
-	right.material.color = NewColor(0.5, 1, 0.1)
+	// right.material.pattern = CheckersPattern(NewColor(1, .4, .6), NewColor(0, 1, 1))
+	// right.material.pattern.SetTransform(Scaling(0.2, 0.2, 0.2))
+	right.material.color = NewColor(1, 1, 1)
 	right.material.diffuse = 0.7
 	right.material.specular = 0.3
+	right.material.reflective = 0.5
 
 	left := NewSphere()
 	left.SetTransform(Translation(-1.5, 0.33, -0.75).MulMatrix(Scaling(0.33, 0.33, 0.33)))
-	left.material.pattern = PatternChain(middle.material.pattern, right.material.pattern)
-	left.material.color = NewColor(1, 0.8, 0.1)
+	// left.material.pattern = PatternChain(middle.material.pattern, right.material.pattern)
+	left.material.color = NewColor(1, 1, 1)
 	left.material.diffuse = 0.7
 	left.material.specular = 0.3
+	left.material.reflective = .5
 
 	lights := []*PointLight{
 		NewPointLight(Point(-10, 10, -10), NewColor(1, 1, 1)),
 		NewPointLight(Point(0, 10, 0), NewColor(0.5, 0.5, 0.5)),
 	}
-	world := NewWorld(lights, []Shape{middle, left, right, floor, leftWall, rightWall})
+	world := NewWorld(lights, []Shape{middle, left, right, floor, leftWall, rightWall, backWall})
 
 	camera := NewCamera(width, height, π/3)
 	camera.SetTransform(ViewTransform(Point(0, 1.5, -5), Point(0, 1, 0), Vector(0, 1, 0)))
 
-	canvas := camera.Render(world)
+	canvas := camera.Render(world, defaultRecursionDepth)
 
 	fmt.Println(time.Now().Sub(start))
 
@@ -202,7 +211,7 @@ func planar(width, height int) {
 	camera := NewCamera(width, height, π/3)
 	camera.SetTransform(ViewTransform(Point(0, 1.5, -5), Point(0, 1, 0), Vector(0, 1, 0)))
 
-	canvas := camera.Render(world)
+	canvas := camera.Render(world, defaultRecursionDepth)
 
 	fmt.Println(time.Now().Sub(start))
 

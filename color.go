@@ -64,5 +64,5 @@ func (c *Color) Format() string {
 
 //String formats a color as a string
 func (c *Color) String() string {
-	return "c(" + floatToString(c.r) + "," + floatToString(c.g) + "," + floatToString(c.b) + ")"
+	return "c(" + floatToString(c.r, 8) + "," + floatToString(c.g, 8) + "," + floatToString(c.b, 8) + ")"
 }

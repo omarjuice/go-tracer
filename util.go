@@ -56,9 +56,13 @@ func zipSum(A, B []float64) float64 {
 }
 
 //FloatToString converts a float to a String
-func floatToString(n float64) string {
+func floatToString(n float64, cut int) string {
 	// to convert a float number to a string
-	return strconv.FormatFloat(n, 'f', 6, 64)[:3]
+	s := strconv.FormatFloat(n, 'f', 6, 64)
+	if cut > len(s) {
+		return s[:]
+	}
+	return s[:cut]
 }
 
 func min(a, b float64) float64 {

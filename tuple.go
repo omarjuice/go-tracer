@@ -125,7 +125,7 @@ func (t *Tuple) String() string {
 	} else {
 		start = "v" + start
 	}
-	return start + floatToString(t.x) + "," + floatToString(t.y) + "," + floatToString(t.z) + ")"
+	return start + floatToString(t.x, 3) + "," + floatToString(t.y, 3) + "," + floatToString(t.z, 3) + ")"
 }
 
 //Transform chains multiple transformations together and applies them

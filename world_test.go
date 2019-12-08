@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"testing"
 )
 
@@ -78,7 +79,7 @@ func TestShadeHit(t *testing.T) {
 	shape := w.objects[0]
 	i := NewIntersection(4, shape)
 	comps := PrepareComputations(i, r)
-	result := w.ShadeHit(comps)
+	result := w.ShadeHit(comps, 10)
 	expected := NewColor(0.38066, 0.47583, 0.2855)
 
 	if !result.Equals(expected) {
@@ -90,7 +91,7 @@ func TestShadeHit(t *testing.T) {
 	shape = w.objects[1]
 	i = NewIntersection(0.5, shape)
 	comps = PrepareComputations(i, r)
-	result = w.ShadeHit(comps)
+	result = w.ShadeHit(comps, 10)
 	expected = NewColor(0.90498, 0.90498, 0.90498)
 
 	if !result.Equals(expected) {
@@ -109,7 +110,7 @@ func TestShadeHit(t *testing.T) {
 	i = NewIntersection(4, s2)
 
 	comps = PrepareComputations(i, r)
-	result = w.ShadeHit(comps)
+	result = w.ShadeHit(comps, 10)
 	expected = NewColor(0.1, 0.1, 0.1)
 
 	if !result.Equals(expected) {
@@ -120,7 +121,7 @@ func TestShadeHit(t *testing.T) {
 func TestWorldColorAt(t *testing.T) {
 	w := DefaultWorld()
 	r := NewRay(Point(0, 0, -5), Vector(0, 1, 0))
-	result := w.ColorAt(r)
+	result := w.ColorAt(r, 10)
 	expected := Black
 
 	if !result.Equals(expected) {
@@ -128,7 +129,7 @@ func TestWorldColorAt(t *testing.T) {
 	}
 
 	r = NewRay(r.origin, Vector(0, 0, 1))
-	result = w.ColorAt(r)
+	result = w.ColorAt(r, 10)
 	expected = NewColor(0.38066, 0.47583, 0.2855)
 
 	if !result.Equals(expected) {
@@ -143,7 +144,7 @@ func TestWorldColorAt(t *testing.T) {
 
 	r = NewRay(Point(0, 0, .75), Vector(0, 0, -1))
 
-	result = w.ColorAt(r)
+	result = w.ColorAt(r, 10)
 	expected = inner.Material().color
 
 	if !result.Equals(expected) {
@@ -174,5 +175,87 @@ func TestIsShadowed(t *testing.T) {
 	if w.IsShadowed(p, 0) {
 		t.Errorf("IsShadowed: There is no shadow when an object is behind the point ")
 	}
+
+}
+
+func TestComputeReflect(t *testing.T) {
+	shape := NewPlane()
+	r := NewRay(Point(0, 1, -1), Vector(0, -math.Sqrt(2)/2, math.Sqrt(2)/2))
+	i := NewIntersection(math.Sqrt(2), shape)
+	comps := PrepareComputations(i, r)
+	expected := Vector(0, math.Sqrt(2)/2, math.Sqrt(2)/2)
+
+	if !comps.reflectv.Equals(expected) {
+		t.Errorf("PrepareComputationsWithReflect: expected %v to be %v", comps.reflectv, expected)
+	}
+
+}
+
+func TestWorldReflect(t *testing.T) {
+	w := DefaultWorld()
+	r := NewRay(Point(0, 0, 0), Vector(0, 0, 1))
+
+	shape := w.objects[1]
+
+	shape.Material().ambient = 1
+	i := NewIntersection(1, shape)
+	comps := PrepareComputations(i, r)
+
+	color := w.ReflectedColor(comps, 10)
+	if !color.Equals(Black) {
+		t.Errorf("WorldReflect(non-reflective): expected %v to be %v", color, Black)
+	}
+
+	shape = NewPlane()
+	shape.Material().reflective = 0.5
+	shape.SetTransform(Translation(0, -1, 0))
+	w.objects = append(w.objects, shape)
+	r = NewRay(Point(0, 0, -3), Vector(0, -math.Sqrt(2)/2, math.Sqrt(2)/2))
+	i = NewIntersection(math.Sqrt(2), shape)
+	comps = PrepareComputations(i, r)
+
+	color = w.ReflectedColor(comps, 10)
+	expected := NewColor(0.19033, 0.237915, 0.142749)
+
+	if !color.Equals(expected) {
+		t.Errorf("WorldReflect(reflective): expected %v to be %v", color, expected)
+	}
+}
+
+func TestShadeHitWithReflect(t *testing.T) {
+	w := DefaultWorld()
+	shape := NewPlane()
+	shape.Material().reflective = 0.5
+	shape.SetTransform(Translation(0, -1, 0))
+	w.objects = append(w.objects, shape)
+	r := NewRay(Point(0, 0, -3), Vector(0, -math.Sqrt(2)/2, math.Sqrt(2)/2))
+	i := NewIntersection(math.Sqrt(2), shape)
+	comps := PrepareComputations(i, r)
+
+	color := w.ShadeHit(comps, 10)
+	expected := NewColor(0.876758, 0.924341, 0.829175)
+
+	if !color.Equals(expected) {
+		t.Errorf("WorldReflect(reflective): expected %v to be %v", color, expected)
+	}
+
+}
+
+func TestInfiniteReflection(t *testing.T) {
+	light := NewPointLight(Point(0, 0, 0), NewColor(1, 1, 1))
+
+	lower := NewPlane()
+	lower.Material().reflective = 1
+	lower.SetTransform(Translation(0, -1, 0))
+
+	upper := NewPlane()
+	upper.Material().reflective = 1
+	upper.SetTransform(Translation(0, 1, 0))
+
+	w := NewWorld([]*PointLight{light}, []Shape{lower, upper})
+
+	r := NewRay(Point(0, 0, 0), Vector(0, 1, 0))
+
+	w.ColorAt(r, 10)
 
 }
