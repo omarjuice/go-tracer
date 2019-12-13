@@ -26,6 +26,15 @@ func NewSphere() *Sphere {
 	return &Sphere{Point(0, 0, 0), IdentityMatrix, DefaultMaterial()}
 }
 
+//GlassSphere returns a transparent sphere
+func GlassSphere() *Sphere {
+	m := DefaultMaterial()
+	m.transparency = 1.0
+	m.refractiveIndex = 1.5
+	return &Sphere{Point(0, 0, 0), IdentityMatrix, m}
+
+}
+
 //Material returns the material of a Sphere
 func (sphere *Sphere) Material() *Material {
 	return sphere.material

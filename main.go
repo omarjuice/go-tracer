@@ -37,7 +37,7 @@ func clock() {
 	}
 }
 func main() {
-	threeSpheres(500, 250)
+	threeSpheres(1000, 500)
 }
 
 func circleCast() {
@@ -144,6 +144,7 @@ func threeSpheres(width, height int) {
 	floor.material.specular = 0.3
 	floor.material.diffuse = 0.5
 	floor.material.shininess = 200
+	// floor.material.reflective = 0.5
 
 	leftWall := NewPlane()
 	leftWall.SetTransform(Translation(0, 0, 5).MulMatrix(RotationY(-π / 4)).MulMatrix(RotationX(π / 2)).MulMatrix(Scaling(10, 0.01, 10)))
@@ -164,7 +165,10 @@ func threeSpheres(width, height int) {
 	middle.material.color = NewColor(1, 1, 1)
 	middle.material.diffuse = 0.7
 	middle.material.specular = 0.3
-	middle.material.reflective = .5
+	middle.material.reflective = 1
+	middle.material.refractiveIndex = 1
+	middle.material.transparency = 1.0
+	middle.material.shininess = 300
 
 	right := NewSphere()
 	right.SetTransform(Translation(1.5, 0.5, -0.5).MulMatrix(Scaling(0.5, 0.5, 0.5)))
@@ -187,7 +191,7 @@ func threeSpheres(width, height int) {
 		NewPointLight(Point(-10, 10, -10), NewColor(1, 1, 1)),
 		NewPointLight(Point(0, 10, 0), NewColor(0.5, 0.5, 0.5)),
 	}
-	world := NewWorld(lights, []Shape{middle, left, right, floor, leftWall, rightWall})
+	world := NewWorld(lights, []Shape{middle, left, right, floor, leftWall, rightWall, backWall})
 
 	camera := NewCamera(width, height, π/3)
 	camera.SetTransform(ViewTransform(Point(0, 1.5, -5), Point(0, 1, 0), Vector(0, 1, 0)))
