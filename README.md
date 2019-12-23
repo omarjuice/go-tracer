@@ -3,7 +3,7 @@
 ### A ray-tracer built in Go
 
 ### (For rendering 3D images)
-
+### Based on *The Ray Tracer Challenge* by Jamis Buck
 
 
 
